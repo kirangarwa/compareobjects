@@ -1,0 +1,67 @@
+//Student Class 
+
+using System;
+using System.Linq;
+
+public class Student : IEquatable<Student>
+{
+	public string Name {get; set;}
+	public int Id {get; set;}
+	public int[] Marks { get; set; }
+	
+	public override bool Equals(object obj) //overriding the existing equals method of object class
+	{
+		return this.Equals(obj as Student);
+	}
+	
+	private bool Equals(Student other) {
+		if(other == null)
+			return false;
+		return this.Id.Equals(other.Id) && this.Name.Equals(other.Name) && !this.Marks.Except(other.Marks).Any() && !other.Marks.Except(this.Marks).Any();
+	}
+	
+	public override int GetHashCode() {   //As we are implementing interface need to override this
+		return base.GetHashCode();
+	}
+}
+
+
+Add this method in default Controller - 
+
+
+[HttpPost("CompareObjects")]
+public Actionresult<string> CompareObjects([FromBody] StudentVM studentVM)
+{
+	try {
+		if(studentVM.obj1!=null && studentVM.obj2 !=null)
+			return Ok(studentVM.obj1.Equals(studentVM.obj2));
+		else 
+			return Ok(false);
+	} 
+	Catch(Exception ex) {
+		return "Exception" + ex;			
+	}
+}
+
+
+public class StudentVM 
+{
+	public Student obj1 { get; set; }
+	public Student obj2 { get; set; }
+}
+
+URL - https://localhost:{port}/api/values/CompareObjects
+
+Body Data Passed from Rest API tool
+{
+	"obj1" : {
+		"Id" : 123,
+		"Name" : "John"
+		"Marks" : [1,2,3]
+	},
+	"obj2" : {
+		"Id" : 123,
+		"Name" : "John"
+		"Marks" : [1,2,3]
+	}
+}
